@@ -87,7 +87,7 @@ const Dashboard = () => {
                     </div>
                     <div>
                         <h2 style={{ fontSize: '1.5rem', margin: 0 }}>
-                            Welcome !
+                            Welcome {settings.businessName || ''}!
                         </h2>
                         {/* <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>{currentUser?.email}</p> */}
                     </div>
