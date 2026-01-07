@@ -86,7 +86,9 @@ const Dashboard = () => {
                         <Receipt size={28} color="var(--primary)" />
                     </div>
                     <div>
-                        <h2 style={{ fontSize: '1.5rem', margin: 0 }}>Welcome {settings.businessName} !</h2>
+                        <h2 style={{ fontSize: '1.5rem', margin: 0 }}>
+                            Welcome !
+                        </h2>
                         {/* <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>{currentUser?.email}</p> */}
                     </div>
                 </div>

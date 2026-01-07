@@ -15,7 +15,6 @@ const Register = () => {
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    // Removed error state, using toast instead
     const [loading, setLoading] = useState(false);
     const { register, loginWithGoogle } = useAuth();
     const navigate = useNavigate();
@@ -41,11 +40,8 @@ const Register = () => {
         setShowOtpModal(true);
 
         try {
-            // Placeholder URL - User needs to provide actual script URL
             const SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
 
-            // Using URLSearchParams ensures data is sent as 'application/x-www-form-urlencoded'
-            // This is a "Simple Request" and NEVER triggers a CORS Preflight (OPTIONS) check.
             const formData = new URLSearchParams();
             formData.append('email', email);
             formData.append('otp', newOtp);
@@ -55,14 +51,12 @@ const Register = () => {
                 method: 'POST',
                 mode: 'no-cors',
                 body: formData
-                // No headers needed, browser sets correct content-type automatically
             });
         } catch (err) {
             console.error('Failed to send OTP:', err);
         }
     };
 
-    // Timer effect
     React.useEffect(() => {
         let interval;
         if (showOtpModal && timer > 0) {
@@ -89,7 +83,6 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Manual validation since 'required' is removed
         if (!name) return toast.error('Please enter business name');
         if (!email) return toast.error('Please enter email address');
         if (!phone) return toast.error('Please enter phone number');
@@ -104,7 +97,6 @@ const Register = () => {
         }
 
         try {
-            console.log("Starting registration process for:", email);
             setLoading(true);
             await register(email, password, name, phone);
             confirmAlert({

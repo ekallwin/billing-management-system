@@ -17,7 +17,6 @@ const PasswordModal = ({ isOpen, onClose }) => {
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-    // Forgot Password & OTP State
     const [resetOtp, setResetOtp] = useState('');
     const [userResetOtp, setUserResetOtp] = useState('');
     const [resetNewPassword, setResetNewPassword] = useState('');
@@ -52,22 +51,27 @@ const PasswordModal = ({ isOpen, onClose }) => {
         const isPasswordProvider = currentUser.providerData.some(p => p.providerId === 'password');
 
         if (isPasswordProvider && !oldPassword) {
-            confirmAlert({ title: 'Error', message: 'Current password is required.', buttons: [{ label: 'OK' }] });
+            toast.error('Current password is required.');
             return;
         }
 
-        if (!newPassword || !confirmPassword) {
-            confirmAlert({ title: 'Error', message: 'New and confirm passwords are required.', buttons: [{ label: 'OK' }] });
+        if (!newPassword) {
+            toast.error('New password is required.');
+            return;
+        }
+
+        if (!confirmPassword) {
+            toast.error('Confirm password is required.');
             return;
         }
 
         if (newPassword.length < 6) {
-            confirmAlert({ title: 'Invalid Password', message: 'New password must be at least 6 characters.', buttons: [{ label: 'OK' }] });
+            toast.error('New password must be at least 6 characters.');
             return;
         }
 
         if (newPassword !== confirmPassword) {
-            confirmAlert({ title: 'Error', message: 'New passwords do not match.', buttons: [{ label: 'OK' }] });
+            toast.error('New passwords do not match.');
             return;
         }
 
@@ -80,7 +84,7 @@ const PasswordModal = ({ isOpen, onClose }) => {
 
             await changePassword(newPassword);
             onClose();
-            confirmAlert({ title: 'Success', message: 'Password updated successfully!', buttons: [{ label: 'OK' }] });
+            toast.success('Password updated successfully!');
         } catch (err) {
             console.error(err);
             let msg = 'Failed to update password.';
@@ -91,7 +95,7 @@ const PasswordModal = ({ isOpen, onClose }) => {
             } else if (err.code === 'auth/requires-recent-login') {
                 msg = 'For security, please logout and login again to change your password.';
             }
-            confirmAlert({ title: 'Error', message: msg, buttons: [{ label: 'OK' }] });
+            toast.error(msg);
         }
     };
 
@@ -123,7 +127,7 @@ const PasswordModal = ({ isOpen, onClose }) => {
             });
         } catch (err) {
             console.error("Failed to send Reset OTP", err);
-            confirmAlert({ title: "Error", message: "Failed to send OTP.", buttons: [{ label: "OK" }] });
+            toast.error("Failed to send OTP.");
         }
     };
 
@@ -137,12 +141,22 @@ const PasswordModal = ({ isOpen, onClose }) => {
 
     const handleForceResetPassword = async (e) => {
         e.preventDefault();
+
+        if (!resetNewPassword) {
+            toast.error("New password is required");
+            return;
+        }
+        if (!resetConfirmPassword) {
+            toast.error("Confirm password is required");
+            return;
+        }
+
         if (resetNewPassword !== resetConfirmPassword) {
-            confirmAlert({ title: "Error", message: "Passwords do not match", buttons: [{ label: "OK" }] });
+            toast.error("Passwords do not match");
             return;
         }
         if (resetNewPassword.length < 6) {
-            confirmAlert({ title: "Error", message: "Password must be at least 6 characters", buttons: [{ label: "OK" }] });
+            toast.error("Password must be at least 6 characters");
             return;
         }
 
@@ -154,11 +168,11 @@ const PasswordModal = ({ isOpen, onClose }) => {
             });
 
             onClose();
-            confirmAlert({ title: "Success", message: "Password updated successfully!", buttons: [{ label: "OK" }] });
+            toast.success("Password updated successfully!");
         } catch (err) {
             console.error(err);
             const errMsg = err.response?.data?.error || err.message || "Failed to update password.";
-            confirmAlert({ title: "Error", message: errMsg, buttons: [{ label: "OK" }] });
+            toast.error(errMsg);
         } finally {
             setResetLoading(false);
         }
@@ -192,7 +206,6 @@ const PasswordModal = ({ isOpen, onClose }) => {
                                         value={oldPassword}
                                         onChange={(e) => setOldPassword(e.target.value)}
                                         style={{ width: '100%', paddingRight: '2.5rem' }}
-                                        required
                                     />
                                     <button
                                         type="button"
@@ -223,7 +236,6 @@ const PasswordModal = ({ isOpen, onClose }) => {
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
                                     style={{ width: '100%', paddingRight: '2.5rem' }}
-                                    required
                                 />
                                 <button
                                     type="button"
@@ -244,7 +256,6 @@ const PasswordModal = ({ isOpen, onClose }) => {
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                     style={{ width: '100%', paddingRight: '2.5rem' }}
-                                    required
                                 />
                                 <button
                                     type="button"

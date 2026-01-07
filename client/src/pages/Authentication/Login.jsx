@@ -10,7 +10,7 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
-    const { login, resetPassword, loginWithGoogle } = useAuth(); // Assuming resetPassword exists or we import auth
+    const { login, resetPassword, loginWithGoogle } = useAuth(); 
     const navigate = useNavigate();
 
     const getErrorMessage = (errCode) => {
