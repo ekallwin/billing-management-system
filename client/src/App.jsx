@@ -10,7 +10,7 @@ import ForgotPassword from './pages/Authentication/ForgotPassword';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastContainer, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { Analytics } from "@vercel/analytics/react"
 const ProtectedRoute = ({ children }) => {
   const { currentUser } = useAuth();
   if (!currentUser) {
@@ -23,6 +23,7 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   return (
     <>
+      <Analytics />
       <div className="mobile-blocker">
         <div className="glass card" style={{ textAlign: 'center', maxWidth: '300px', padding: '2rem' }}>
           <div style={{ marginBottom: '1rem' }}>
