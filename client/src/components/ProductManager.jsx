@@ -5,7 +5,14 @@ import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
 const ProductManager = () => {
-    const [products, setProducts] = useState([]);
+    const [products, setProducts] = useState(() => {
+        try {
+            const saved = localStorage.getItem('products');
+            return saved ? JSON.parse(saved).sort((a, b) => a.name.localeCompare(b.name)) : [];
+        } catch (e) {
+            return [];
+        }
+    });
     const [editing, setEditing] = useState(null);
     const [formData, setFormData] = useState({ name: '', price: '' });
     const [showAdd, setShowAdd] = useState(false);
@@ -15,8 +22,14 @@ const ProductManager = () => {
     }, []);
 
     const fetchProducts = async () => {
-        const res = await api.get('/products');
-        setProducts(res.data);
+        try {
+            const res = await api.get('/products');
+            const sorted = res.data.sort((a, b) => a.name.localeCompare(b.name));
+            setProducts(sorted);
+            localStorage.setItem('products', JSON.stringify(sorted));
+        } catch (err) {
+            console.error("Failed to fetch products", err);
+        }
     };
 
     const handleSubmit = async (e) => {

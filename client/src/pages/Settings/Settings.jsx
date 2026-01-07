@@ -13,6 +13,7 @@ import DangerZone from './components/DangerZone';
 import PasswordModal from './components/PasswordModal';
 import DeleteAccountModals from './components/DeleteAccountModals';
 import PrinterInfoModal from './components/PrinterInfoModal';
+import ConfirmDialog from '../../components/ConfirmDialog';
 
 const Settings = () => {
     const { currentUser } = useAuth();
@@ -55,49 +56,36 @@ const Settings = () => {
     }, [currentUser]);
 
     const handleSave = (section) => {
+        if (section === 'UPI ID' && !settings.upiId) {
+            confirmAlert({ title: 'Error', message: 'UPI ID is required.', buttons: [{ label: 'OK' }] });
+            return;
+        }
+
+        if (section === 'Business Profile' && settings.phone && settings.phone.length !== 10) {
+            confirmAlert({ title: 'Invalid Phone', message: 'Phone number must be exactly 10 digits.', buttons: [{ label: 'OK' }] });
+            return;
+        }
+
         confirmAlert({
             customUI: ({ onClose }) => {
                 return (
-                    <div className="glass custom-modal-content animate-fade" style={{ textAlign: 'center', padding: '2rem' }}>
-                        <h2 style={{ marginBottom: '1rem', color: 'var(--text-main)' }}>Update {section}?</h2>
-                        <p style={{ marginBottom: '2rem', color: 'var(--text-muted)' }}>Are you sure you want to save the new {section} configuration?</p>
-                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                            <button
-                                className="btn"
-                                style={{ background: '#e2e8f0', color: 'var(--text-main)', padding: '0.6rem 1.5rem' }}
-                                onClick={onClose}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                className="btn btn-primary"
-                                style={{ padding: '0.6rem 1.5rem' }}
-                                onClick={async () => {
-                                    if (section === 'UPI ID' && !settings.upiId) {
-                                        confirmAlert({ title: 'Error', message: 'UPI ID is required.', buttons: [{ label: 'OK' }] });
-                                        return;
-                                    }
-
-                                    if (section === 'Business Profile' && settings.phone && settings.phone.length !== 10) {
-                                        confirmAlert({ title: 'Invalid Phone', message: 'Phone number must be exactly 10 digits.', buttons: [{ label: 'OK' }] });
-                                        return;
-                                    }
-                                    try {
-                                        await api.put('/settings', settings);
-                                        setEditMode({ upi: false, tax: false, print: false, profile: false });
-                                        onClose();
-                                        confirmAlert({ title: 'Success', message: `${section} updated successfully!`, buttons: [{ label: 'OK' }] });
-                                    } catch (err) {
-                                        console.error(err);
-                                        confirmAlert({ title: 'Error', message: `Failed to update ${section}`, buttons: [{ label: 'OK' }] });
-                                        onClose();
-                                    }
-                                }}
-                            >
-                                Yes, Save
-                            </button>
-                        </div>
-                    </div>
+                    <ConfirmDialog
+                        title={`Update ${section}?`}
+                        message={`Are you sure you want to save the new ${section} configuration?`}
+                        confirmText="Yes, Save"
+                        onClose={onClose}
+                        onConfirm={async () => {
+                            try {
+                                await api.put('/settings', settings);
+                                setEditMode({ upi: false, tax: false, print: false, profile: false });
+                                onClose();
+                                confirmAlert({ title: 'Success', message: `${section} updated successfully!`, buttons: [{ label: 'OK' }] });
+                            } catch (err) {
+                                console.error(err);
+                                confirmAlert({ title: 'Error', message: `Failed to update ${section}`, buttons: [{ label: 'OK' }] });
+                            }
+                        }}
+                    />
                 );
             }
         });

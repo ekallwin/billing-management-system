@@ -57,7 +57,7 @@ const TaxSettings = ({ settings, setSettings, editMode, setEditMode, handleSave 
                             className="input-field"
                             type="number"
                             inputMode="numeric"
-                            placeholder="0"
+                            placeholder=""
                             value={settings.taxPercent}
                             onChange={(e) => setSettings({ ...settings, taxPercent: e.target.value })}
                             disabled={!editMode.tax || !settings.taxEnabled}

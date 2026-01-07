@@ -133,7 +133,7 @@ const Transactions = () => {
             {loading ? (
                 <div className="glass card" style={{ textAlign: 'center', padding: '4rem' }}>Loading transactions...</div>
             ) : bills.length === 0 ? (
-                <div className="glass card" style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
+                <div className="glass card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
                     <Receipt size={48} style={{ opacity: 0.2, marginBottom: '1rem' }} />
                     <p>No transactions found for this period.</p>
                 </div>

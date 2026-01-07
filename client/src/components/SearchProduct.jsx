@@ -17,7 +17,7 @@ const SearchProduct = ({ onAdd }) => {
         const fetchProducts = async () => {
             try {
                 const res = await api.get('/products');
-                setProducts(res.data);
+                setProducts(res.data.sort((a, b) => a.name.localeCompare(b.name)));
             } catch (err) {
                 console.error(err);
             }

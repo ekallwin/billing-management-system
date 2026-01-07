@@ -4,10 +4,10 @@ import { Printer, CheckCircle, QrCode as QRIcon } from 'lucide-react';
 import api from '../api';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import ConfirmDialog from './ConfirmDialog';
 
 const BillPreview = ({ items, total, settings, onReset }) => {
     const [showQR, setShowQR] = useState(false);
-    const [saving, setSaving] = useState(false);
 
     const {
         upiId, merchantName, transactionName,
@@ -27,7 +27,7 @@ const BillPreview = ({ items, total, settings, onReset }) => {
         const minutes = String(d.getMinutes()).padStart(2, '0');
         const ampm = hours >= 12 ? 'PM' : 'AM';
         hours = hours % 12;
-        hours = hours ? hours : 12; 
+        hours = hours ? hours : 12;
         return `${day}-${month}-${year} ${hours}:${minutes} ${ampm}`;
     };
 
@@ -41,49 +41,37 @@ const BillPreview = ({ items, total, settings, onReset }) => {
         confirmAlert({
             customUI: ({ onClose }) => {
                 return (
-                    <div className="glass custom-modal-content animate-fade" style={{ textAlign: 'center', padding: '2rem' }}>
-                        <h2 style={{ marginBottom: '1rem', color: 'var(--text-main)' }}>Confirm Payment</h2>
-                        <p style={{ marginBottom: '2rem', color: 'var(--text-muted)' }}>Are you sure you want to save this bill and mark it as paid?</p>
-                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                            <button
-                                className="btn"
-                                style={{ background: '#e2e8f0', color: 'var(--text-main)', padding: '0.6rem 1.5rem' }}
-                                onClick={onClose}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                className="btn"
-                                style={{ background: 'var(--accent)', color: 'white', padding: '0.6rem 1.5rem' }}
-                                onClick={async () => {
-                                    setSaving(true);
-                                    try {
-                                        await api.post('/bills', {
-                                            items,
-                                            subtotal: total,
-                                            taxAmount,
-                                            totalAmount: grandTotal,
-                                            status: 'Paid'
-                                        });
-                                        onReset();
-                                        onClose();
-                                    } catch (err) {
-                                        console.error(err);
-                                        confirmAlert({
-                                            title: 'Error',
-                                            message: 'Error saving bill',
-                                            buttons: [{ label: 'OK', onClick: () => { } }]
-                                        });
-                                        onClose();
-                                    } finally {
-                                        setSaving(false);
-                                    }
-                                }}
-                            >
-                                {saving ? 'Saving...' : 'Yes, Save & Pay'}
-                            </button>
-                        </div>
-                    </div>
+                    <ConfirmDialog
+                        title="Confirm Payment"
+                        message="Are you sure you want to save this bill and mark it as paid?"
+                        confirmText="Yes, Save & Pay"
+                        onClose={onClose}
+                        onConfirm={async () => {
+                            try {
+                                await api.post('/bills', {
+                                    items,
+                                    subtotal: total,
+                                    taxAmount,
+                                    totalAmount: grandTotal,
+                                    status: 'Paid'
+                                });
+                                onReset();
+                                onClose();
+                                confirmAlert({
+                                    title: 'Success',
+                                    message: 'Transaction Successful!',
+                                    buttons: [{ label: 'OK', onClick: () => { } }]
+                                });
+                            } catch (err) {
+                                console.error(err);
+                                confirmAlert({
+                                    title: 'Error',
+                                    message: 'Error saving bill',
+                                    buttons: [{ label: 'OK', onClick: () => { } }]
+                                });
+                            }
+                        }}
+                    />
                 );
             }
         });
@@ -161,10 +149,10 @@ const BillPreview = ({ items, total, settings, onReset }) => {
                 <button
                     className="btn btn-primary"
                     onClick={handleMarkAsPaid}
-                    disabled={saving || items.length === 0}
+                    disabled={items.length === 0}
                     style={{ width: '100%', justifyContent: 'center', background: 'var(--accent)' }}
                 >
-                    <CheckCircle size={18} /> {saving ? 'Saving...' : 'Mark as Paid'}
+                    <CheckCircle size={18} /> Mark as Paid
                 </button>
             </div>
 
